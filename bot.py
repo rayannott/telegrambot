@@ -9,7 +9,9 @@ import json
 
 print(f'----------------- Bot started at {datetime.now()} -----------------')
 
-API_TOKEN = "5776672843:AAHoH2Z2rhTXJcGr0XZBbrtt5xMyTfcR-_o"
+with open('api_token.txt', 'r') as f:
+    API_TOKEN = f.read()
+
 bot = telebot.TeleBot(API_TOKEN)
 
 def get_record_chatid_map() -> dict:
@@ -177,11 +179,12 @@ def stocks(message):
     log_message(message)
     if (m := re.compile(stocks_pattern).match(message.text)):
         ticker, = m.groups()
-        regular_price, close_price = get_stocks_price(ticker)
-        if regular_price:
+        try:
+            regular_price, close_price = get_stocks_price(ticker)
             bot.send_message(chid(message), f'Regular market price: {regular_price}\nClosing price: {close_price}')
-        else:
+        except KeyError as e:
             bot.send_message(chid(message), f'Unknown ticker: {ticker}.')
+            print(e)
     else:
         bot.send_message(chid(message), 'Wrong format.')
 
