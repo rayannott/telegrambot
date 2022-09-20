@@ -7,7 +7,7 @@ from utils import *
 import re
 import json
 
-print(f'-----------------Bot started at {datetime.now()}-----------------')
+print(f'----------------- Bot started at {datetime.now()} -----------------')
 
 API_TOKEN = "5776672843:AAHoH2Z2rhTXJcGr0XZBbrtt5xMyTfcR-_o"
 bot = telebot.TeleBot(API_TOKEN)
