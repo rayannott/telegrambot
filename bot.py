@@ -14,23 +14,6 @@ with open('api_token.txt', 'r') as f:
 
 bot = telebot.TeleBot(API_TOKEN)
 
-def get_record_chatid_map() -> dict:
-    with open('username_chatid_map.json', 'r') as f:
-        return json.load(f)
-
-def save_record_chatid_map(username_to_chat_id) -> None:
-    with open('username_chatid_map.json', 'w') as fj:
-        json.dump(username_to_chat_id, fj)
-
-def record_chat_id(message) -> bool:
-    username_to_chat_id = get_record_chatid_map()
-    if message.from_user.username not in username_to_chat_id:
-        username_to_chat_id[message.from_user.username] = message.chat.id
-        save_record_chatid_map(username_to_chat_id)
-        return True
-    return False
-
-
 
 # basic commands
 
@@ -51,17 +34,27 @@ def send_help(message):
         '"/prime <number>" to test if the entered number is a prime;',
         '"/random <a> <b>" to get a random integer from [a, b];',
         '"/advice" to get a random advice or "/advice <keyword>" to get some advice with a given key word;',
-        '"/stocks <ticker>" to get a given stock\'s price.'
+        '"/stocks <ticker>" to get a given stock\'s price;',
+        '"/keyboard";',
+        '"/sub" or "/unsub"'
     ])
     bot.reply_to(message, help_text)
 
 @bot.message_handler(commands=['sub'])
 @log
 def sub(message):
-    if record_chat_id(message):
-        bot.send_message(chid(message), 'You will get a notification soon!')
+    if record_chat_id_entry(message):
+        bot.send_message(chid(message), 'You have just subscribed!')
     else:
         bot.send_message(chid(message), 'You are already subscribed!')
+
+@bot.message_handler(commands=['unsub'])
+@log
+def sub(message):
+    if delete_chat_id_entry(message):
+        bot.send_message(chid(message), 'You have successfully unsubscribed!')
+    else:
+        bot.send_message(chid(message), 'You are not subscribed yet!')
 
 @bot.message_handler(commands=['notify'])
 @log
@@ -259,7 +252,7 @@ def some_photo(message):
 @bot.message_handler(func=lambda message: message.text.startswith('/'))
 @log
 def echo_command(message):
-    bot.send_message(chid(message), 'Sorry, I don\'t know this command. Try typing /help')
+    bot.send_message(chid(message), f'Unknown command: {message.text}. Try typing /help')
 
 @bot.message_handler(func=lambda message: True)
 @log

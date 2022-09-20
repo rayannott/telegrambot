@@ -29,6 +29,32 @@ def log(func):
         return func(msg)
     return wrapper_func
 
+
+def get_record_chatid_map() -> dict:
+    with open('username_chatid_map.json', 'r') as f:
+        return json.load(f)
+
+def save_record_chatid_map(username_to_chat_id) -> None:
+    with open('username_chatid_map.json', 'w') as fj:
+        json.dump(username_to_chat_id, fj)
+
+def record_chat_id_entry(message) -> bool:
+    username_to_chat_id = get_record_chatid_map()
+    if message.from_user.username not in username_to_chat_id:
+        username_to_chat_id[message.from_user.username] = message.chat.id
+        save_record_chatid_map(username_to_chat_id)
+        return True
+    return False
+
+def delete_chat_id_entry(message) -> bool:
+    username_to_chat_id = get_record_chatid_map()
+    if message.from_user.username in username_to_chat_id:
+        del username_to_chat_id[message.from_user.username]
+        save_record_chatid_map(username_to_chat_id)
+        return True
+    return False
+
+
 def is_prime(n: int) -> bool:
     if n == 2 or n == 3: return True
     if n % 2 == 0 or n < 2: return False
