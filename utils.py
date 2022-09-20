@@ -1,6 +1,33 @@
 from urllib.request import urlopen
 import json
 from yfinance import Ticker
+from datetime import datetime
+
+def chid(message):
+    '''
+    Returns message's chat id
+    '''
+    return message.chat.id
+
+def log_message(message, extra=''):
+    if (mct := message.content_type) == 'text':
+        to_log = f'{datetime.now()}\t{message.from_user.username}\ttext\t[{message.text}] {extra}'
+    elif mct == 'photo':
+        to_log = f'{datetime.now()}\t{message.from_user.username}\tphoto\t[{message.text}]\tid={message.photo[0].file_id}'
+    elif mct == 'document':
+        to_log = f'{datetime.now()}\t{message.from_user.username}\tdocument\t[{message.text}]\tid={message.document.file_id}'
+    elif mct == 'voice':
+        to_log = f'{datetime.now()}\t{message.from_user.username}\tvoice\t[{message.text}]\tid={message.voice.file_id}'
+    elif mct == 'contact':
+        to_log = f'{datetime.now()}\t{message.from_user.username}\tcontact\t[{message.text}]\tphone={message.contact.phone_number}\tuser_id={message.contact.user_id}'
+    with open('log.txt', 'a+') as f:
+        print(to_log, file=f)
+
+def log(func):
+    def wrapper_func(msg):
+        log_message(msg)
+        return func(msg)
+    return wrapper_func
 
 def is_prime(n: int) -> bool:
     if n == 2 or n == 3: return True

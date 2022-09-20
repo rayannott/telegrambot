@@ -1,7 +1,7 @@
 from random import randint
 import telebot
 from telebot import types
-from datetime import datetime
+# from datetime import datetime
 import requests
 from utils import *
 import re
@@ -30,42 +30,22 @@ def record_chat_id(message) -> bool:
         return True
     return False
 
-def chid(message):
-    '''
-    Returns message's chat id
-    '''
-    return message.chat.id
-
-def log_message(message, extra=''):
-    if (mct := message.content_type) == 'text':
-        to_log = f'{datetime.now()}\t{message.from_user.username}\ttext\t[{message.text}] {extra}'
-    elif mct == 'photo':
-        to_log = f'{datetime.now()}\t{message.from_user.username}\tphoto\t[{message.text}]\tid={message.photo[0].file_id}'
-    elif mct == 'document':
-        to_log = f'{datetime.now()}\t{message.from_user.username}\tdocument\t[{message.text}]\tid={message.document.file_id}'
-    elif mct == 'voice':
-        to_log = f'{datetime.now()}\t{message.from_user.username}\tvoice\t[{message.text}]\tid={message.voice.file_id}'
-    elif mct == 'contact':
-        to_log = f'{datetime.now()}\t{message.from_user.username}\tcontact\t[{message.text}]\tphone={message.contact.phone_number}\tuser_id={message.contact.user_id}'
-    with open('log.txt', 'a+') as f:
-        print(to_log, file=f)
-
 
 
 # basic commands
 
 @bot.message_handler(commands=['start'])
+@log
 def send_welcome(message):
     start_text = '\n'.join([
         f'Hello, {message.from_user.first_name}!',
         'Type /help to see the command list.'
     ])
     bot.reply_to(message, start_text)
-    log_message(message)
 
 @bot.message_handler(commands=['help'])
+@log
 def send_help(message):
-    log_message(message)
     help_text = '\n'.join([
         'Try these commands:',
         '"/prime <number>" to test if the entered number is a prime;',
@@ -76,16 +56,16 @@ def send_help(message):
     bot.reply_to(message, help_text)
 
 @bot.message_handler(commands=['sub'])
+@log
 def sub(message):
-    log_message(message)
     if record_chat_id(message):
         bot.send_message(chid(message), 'You will get a notification soon!')
     else:
         bot.send_message(chid(message), 'You are already subscribed!')
 
 @bot.message_handler(commands=['notify'])
+@log
 def notify(message):
-    log_message(message)
     if chid(message) == 409474295:
         user_chat_ids = get_record_chatid_map()
         for username, chat_id in user_chat_ids.items():
@@ -140,8 +120,8 @@ def process_inline_buttons(callback):
 
 prime_pattern = r'/prime +(\d+)$'
 @bot.message_handler(commands=['prime'])
+@log
 def is_prime_number(message):
-    log_message(message)
     if (m := re.compile(prime_pattern).match(message.text)):
         num, = m.groups()
         not_ = 'NOT ' if not is_prime(int(num)) else ''
@@ -152,8 +132,8 @@ def is_prime_number(message):
 
 rnd_number_pattern = r'/random +(\d+) +(\d+)$'
 @bot.message_handler(commands=['random'])
+@log
 def get_random_number(message):
-    log_message(message)
     if (m := re.compile(rnd_number_pattern).match(message.text)):
         a, b = m.groups()
         ret_text = f'Your number is {randint(int(a), int(b))}'
@@ -163,6 +143,7 @@ def get_random_number(message):
 
 advice_pattern = r'/advice +(\w+)'
 @bot.message_handler(commands=['advice'])
+# log_message function has an extra argument => no decorator here
 def get_advice(message):
     if (m := re.compile(advice_pattern).match(message.text)):
         word, = m.groups()
@@ -175,8 +156,8 @@ def get_advice(message):
 
 stocks_pattern = r'/stocks +(\w+)'
 @bot.message_handler(commands=['stocks'])
+@log
 def stocks(message):
-    log_message(message)
     if (m := re.compile(stocks_pattern).match(message.text)):
         ticker, = m.groups()
         try:
@@ -190,8 +171,8 @@ def stocks(message):
 
 req_photo_by_id_pattern = r'/photo +(.+)$'
 @bot.message_handler(commands=['photo'])
+@log
 def get_photo_by_id(message):
-    log_message(message)
     if (m := re.compile(req_photo_by_id_pattern).match(message.text)):
         photo_id, = m.groups()
         print(photo_id)
@@ -205,8 +186,8 @@ def get_photo_by_id(message):
 
 req_file_by_id_pattern = r'/file +(.+)$'
 @bot.message_handler(commands=['file'])
+@log
 def get_file_by_id(message):
-    log_message(message)
     if (m := re.compile(req_file_by_id_pattern).match(message.text)):
         file_id, = m.groups()
         print(file_id)
@@ -220,8 +201,8 @@ def get_file_by_id(message):
 
 download_pattern = r'/download +(.+)$'
 @bot.message_handler(commands=['download'])
+@log
 def get_file_by_id(message):
-    log_message(message)
     if (m := re.compile(download_pattern).match(message.text)):
         file_id, = m.groups()
         print(file_id)
@@ -241,26 +222,26 @@ def get_file_by_id(message):
 # by content type
 
 @bot.message_handler(content_types=['photo'])
+@log
 def process_photo(message):
-    log_message(message)
     print('photo', message.photo[0])
     bot.send_message(chid(message), f'Got a photo of size {message.photo[0].file_size} bytes')
     
 @bot.message_handler(content_types=['document'])
+@log
 def process_file(message):
-    log_message(message)
     print('document', message.document)
     bot.send_message(chid(message), f'Got a document {message.document.file_name} of size {message.document.file_size} bytes')
 
 @bot.message_handler(content_types=['voice'])
+@log
 def process_voice(message):
-    log_message(message)
     print('voice', message.voice)
     bot.send_message(chid(message), f'Got a voice message ({message.voice.duration} sec) of size {message.voice.file_size} bytes')
 
 @bot.message_handler(content_types=['contact'])
+@log
 def process_contact(message):
-    log_message(message)
     mc = message.contact
     with open('contacts.csv', 'a+') as f:
         print(mc.first_name, mc.phone_number, mc.user_id, file=f, sep=',')
@@ -268,21 +249,21 @@ def process_contact(message):
 
 # from the local dir
 @bot.message_handler(commands=['getphoto'])
+@log
 def some_photo(message):
-    log_message(message)
     print('sending a photo')
     with open('photos/test1.png', 'rb') as photo:
         bot.send_photo(chid(message), photo)
 
 # else:
 @bot.message_handler(func=lambda message: message.text.startswith('/'))
+@log
 def echo_command(message):
-    log_message(message)
     bot.send_message(chid(message), 'Sorry, I don\'t know this command. Try typing /help')
 
 @bot.message_handler(func=lambda message: True)
+@log
 def echo_all(message):
-    log_message(message)
     bot.send_message(chid(message), 'What sort of gibberish is this?')
 
 bot.infinity_polling()
