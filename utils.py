@@ -11,16 +11,16 @@ def chid(message):
 
 def log_message(message, extra=''):
     if (mct := message.content_type) == 'text':
-        to_log = f'{datetime.now()}\t{message.from_user.username}\ttext\t[{message.text}] {extra}'
+        to_log = f'{datetime.now()}\t{message.from_user.username}({message.chat.id})\ttext\t[{message.text}] {extra}'
     elif mct == 'photo':
-        to_log = f'{datetime.now()}\t{message.from_user.username}\tphoto\t[{message.text}]\tid={message.photo[0].file_id}'
+        to_log = f'{datetime.now()}\t{message.from_user.username}({message.chat.id})\tphoto\t[{message.text}]\tid={message.photo[0].file_id}'
     elif mct == 'document':
-        to_log = f'{datetime.now()}\t{message.from_user.username}\tdocument\t[{message.text}]\tid={message.document.file_id}'
+        to_log = f'{datetime.now()}\t{message.from_user.username}({message.chat.id})\tdocument\t[{message.text}]\tid={message.document.file_id}'
     elif mct == 'voice':
-        to_log = f'{datetime.now()}\t{message.from_user.username}\tvoice\t[{message.text}]\tid={message.voice.file_id}'
+        to_log = f'{datetime.now()}\t{message.from_user.username}({message.chat.id})\tvoice\t[{message.text}]\tid={message.voice.file_id}'
     elif mct == 'contact':
-        to_log = f'{datetime.now()}\t{message.from_user.username}\tcontact\t[{message.text}]\tphone={message.contact.phone_number}\tuser_id={message.contact.user_id}'
-    with open('log.txt', 'a+') as f:
+        to_log = f'{datetime.now()}\t{message.from_user.username}({message.chat.id})\tcontact\t[{message.text}]\tphone={message.contact.phone_number}\tuser_id={message.contact.user_id}'
+    with open('log.txt', 'a+', encoding='utf-8') as f:
         print(to_log, file=f)
 
 def log(func):
