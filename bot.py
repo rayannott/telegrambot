@@ -1,13 +1,11 @@
-from random import randint
 import telebot
 from telebot import types
-# from datetime import datetime
-import requests
 from utils import *
+from random import randint
+import requests
 import re
-import json
 
-print(f'----------------- Bot started at {datetime.now()} -----------------')
+print(f'----------------- Bot started at {(t1:=datetime.now())} -----------------')
 
 with open('api_token.txt', 'r') as f:
     API_TOKEN = f.read()
@@ -121,7 +119,7 @@ def is_prime_number(message):
         ret_text = f'{num} is {not_}a prime number'
         bot.reply_to(message, ret_text)
     else:
-        bot.send_message(chid(message), 'Wrong format.')
+        bot.send_message(chid(message), 'Wrong format. Try "/prime 23"')
 
 rnd_number_pattern = r'/random +(\d+) +(\d+)$'
 @bot.message_handler(commands=['random'])
@@ -132,7 +130,7 @@ def get_random_number(message):
         ret_text = f'Your number is {randint(int(a), int(b))}'
         bot.reply_to(message, ret_text)
     else:
-        bot.send_message(chid(message), 'Wrong format.')
+        bot.send_message(chid(message), 'Wrong format. Try "/random 1 10"')
 
 advice_pattern = r'/advice +(\w+)'
 @bot.message_handler(commands=['advice'])
@@ -154,13 +152,13 @@ def stocks(message):
     if (m := re.compile(stocks_pattern).match(message.text)):
         ticker, = m.groups()
         try:
-            regular_price, close_price = get_stocks_price(ticker)
-            bot.send_message(chid(message), f'Regular market price: {regular_price}\nClosing price: {close_price}')
+            regular_price, close_price, name = get_stocks_price(ticker)
+            bot.send_message(chid(message), f'{name}\nRegular market price: {regular_price}\nClosing price: {close_price}')
         except KeyError as e:
             bot.send_message(chid(message), f'Unknown ticker: {ticker}.')
             print(e)
     else:
-        bot.send_message(chid(message), 'Wrong format.')
+        bot.send_message(chid(message), 'Wrong format. Try "/stocks aapl"')
 
 req_photo_by_id_pattern = r'/photo +(.+)$'
 @bot.message_handler(commands=['photo'])
@@ -260,3 +258,6 @@ def echo_all(message):
     bot.send_message(chid(message), 'What sort of gibberish is this?')
 
 bot.infinity_polling()
+
+print(f'----------------- Bot shut down at {(t2:=datetime.now())} -----------------')
+print('running time:', t2 - t1)

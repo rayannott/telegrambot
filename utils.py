@@ -83,4 +83,4 @@ def get_list_of_advice(key_word) -> list[str]:
 def get_stocks_price(ticker):
     stock = Ticker(ticker)
     stock_info = stock.info
-    return stock_info['regularMarketPrice'], stock_info['regularMarketPreviousClose']
+    return stock_info['regularMarketPrice'], stock_info['regularMarketPreviousClose'], stock_info['longName']
