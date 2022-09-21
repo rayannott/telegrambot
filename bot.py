@@ -255,7 +255,7 @@ def echo_command(message):
 @bot.message_handler(func=lambda message: True)
 @log
 def echo_all(message):
-    bot.send_message(chid(message), 'What sort of gibberish is this?')
+    bot.send_message(chid(message), f'Here will be a response to {message.text}')
 
 bot.infinity_polling()
 
