@@ -234,8 +234,8 @@ def voice(message):
 @log
 def contact(message):
     mc = message.contact
-    with open('contacts.csv', 'a+') as f:
-        print(mc.first_name, mc.phone_number, mc.user_id, file=f, sep=',')
+    with open('contacts.csv', 'a+', encoding='utf-8') as f:
+        print(message.from_user.username, mc.first_name, mc.phone_number, mc.user_id, chid(message), file=f, sep=',')
     bot.send_message(chid(message), 'Contact successfully received!', reply_markup=types.ReplyKeyboardRemove())
 
 # from the local dir
