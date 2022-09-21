@@ -24,6 +24,9 @@ def log_message(message, extra=''):
         print(to_log, file=f)
 
 def log(func):
+    '''
+    Decorator for logging users' queries with the log_message() funcion
+    '''
     def wrapper_func(msg):
         log_message(msg)
         return func(msg)
@@ -31,10 +34,12 @@ def log(func):
 
 
 def get_record_chatid_map() -> dict:
+    # load the "username -> chat id" mapping 
     with open('username_chatid_map.json', 'r') as f:
         return json.load(f)
 
-def save_record_chatid_map(username_to_chat_id) -> None:
+def save_record_chatid_map(username_to_chat_id: dict) -> None:
+    # serialize the mapping
     with open('username_chatid_map.json', 'w') as fj:
         json.dump(username_to_chat_id, fj)
 
@@ -80,7 +85,7 @@ def get_list_of_advice(key_word) -> list[str]:
         return '\n'.join((s['advice'] for s in slips))
     return f'No advice for {key_word} :('
 
-def get_stocks_price(ticker):
+def get_stocks_price(ticker) -> tuple(float, float, str):
     stock = Ticker(ticker)
     stock_info = stock.info
     return stock_info['regularMarketPrice'], stock_info['regularMarketPreviousClose'], stock_info['longName']
