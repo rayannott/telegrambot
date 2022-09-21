@@ -48,7 +48,7 @@ def sub(message):
 
 @bot.message_handler(commands=['unsub'])
 @log
-def sub(message):
+def unsub(message):
     if delete_chat_id_entry(message):
         bot.send_message(chid(message), 'You have successfully unsubscribed!')
     else:
@@ -69,7 +69,7 @@ def notify(message):
 # commands with keyboards
 
 @bot.message_handler(commands=['keyboard'])
-def get_keyboard_type(message):
+def keyboard(message):
     sent = bot.send_message(chid(message), 'Enter a keyboard type (inline/reply/info):')
     bot.register_next_step_handler(sent, start_keyboard)
 def start_keyboard(message):
@@ -112,7 +112,7 @@ def process_inline_buttons(callback):
 prime_pattern = r'/prime +(\d+)$'
 @bot.message_handler(commands=['prime'])
 @log
-def is_prime_number(message):
+def prime(message):
     if (m := re.compile(prime_pattern).match(message.text)):
         num, = m.groups()
         not_ = 'NOT ' if not is_prime(int(num)) else ''
@@ -124,7 +124,7 @@ def is_prime_number(message):
 rnd_number_pattern = r'/random +(\d+) +(\d+)$'
 @bot.message_handler(commands=['random'])
 @log
-def get_random_number(message):
+def random(message):
     if (m := re.compile(rnd_number_pattern).match(message.text)):
         a, b = m.groups()
         ret_text = f'Your number is {randint(int(a), int(b))}'
@@ -135,7 +135,7 @@ def get_random_number(message):
 advice_pattern = r'/advice +(\w+)'
 @bot.message_handler(commands=['advice'])
 # log_message function has an extra argument => no decorator here
-def get_advice(message):
+def advice(message):
     if (m := re.compile(advice_pattern).match(message.text)):
         word, = m.groups()
         advice = get_list_of_advice(word)
@@ -163,7 +163,7 @@ def stocks(message):
 req_photo_by_id_pattern = r'/photo +(.+)$'
 @bot.message_handler(commands=['photo'])
 @log
-def get_photo_by_id(message):
+def photo(message):
     if (m := re.compile(req_photo_by_id_pattern).match(message.text)):
         photo_id, = m.groups()
         print(photo_id)
@@ -178,7 +178,7 @@ def get_photo_by_id(message):
 req_file_by_id_pattern = r'/file +(.+)$'
 @bot.message_handler(commands=['file'])
 @log
-def get_file_by_id(message):
+def file(message):
     if (m := re.compile(req_file_by_id_pattern).match(message.text)):
         file_id, = m.groups()
         print(file_id)
@@ -193,7 +193,7 @@ def get_file_by_id(message):
 download_pattern = r'/download +(.+)$'
 @bot.message_handler(commands=['download'])
 @log
-def get_file_by_id(message):
+def download(message):
     if (m := re.compile(download_pattern).match(message.text)):
         file_id, = m.groups()
         print(file_id)
@@ -214,25 +214,25 @@ def get_file_by_id(message):
 
 @bot.message_handler(content_types=['photo'])
 @log
-def process_photo(message):
+def photo(message):
     print('photo', message.photo[0])
     bot.send_message(chid(message), f'Got a photo of size {message.photo[0].file_size} bytes')
     
 @bot.message_handler(content_types=['document'])
 @log
-def process_file(message):
+def document(message):
     print('document', message.document)
     bot.send_message(chid(message), f'Got a document {message.document.file_name} of size {message.document.file_size} bytes')
 
 @bot.message_handler(content_types=['voice'])
 @log
-def process_voice(message):
+def voice(message):
     print('voice', message.voice)
     bot.send_message(chid(message), f'Got a voice message ({message.voice.duration} sec) of size {message.voice.file_size} bytes')
 
 @bot.message_handler(content_types=['contact'])
 @log
-def process_contact(message):
+def contact(message):
     mc = message.contact
     with open('contacts.csv', 'a+') as f:
         print(mc.first_name, mc.phone_number, mc.user_id, file=f, sep=',')
@@ -241,7 +241,7 @@ def process_contact(message):
 # from the local dir
 @bot.message_handler(commands=['getphoto'])
 @log
-def some_photo(message):
+def getphoto(message):
     print('sending a photo')
     with open('photos/test1.png', 'rb') as photo:
         bot.send_photo(chid(message), photo)
