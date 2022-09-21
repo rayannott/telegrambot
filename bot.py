@@ -160,6 +160,18 @@ def stocks(message):
     else:
         bot.send_message(chid(message), 'Wrong format. Try "/stocks aapl"')
 
+send_pattern = r'/send +(\d+) +(.*)$'
+@bot.message_handler(commands=['send'])
+@log
+def send(message):
+    if (m:=re.compile(send_pattern).match(message.text)):
+        to_chat_id, msg_text = m.groups()
+        try:
+            bot.send_message(int(to_chat_id), msg_text)
+            print('sending', to_chat_id, msg_text)
+        except Exception as e:
+            print(e)
+
 req_photo_by_id_pattern = r'/photo +(.+)$'
 @bot.message_handler(commands=['photo'])
 @log
