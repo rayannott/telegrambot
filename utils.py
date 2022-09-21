@@ -85,7 +85,7 @@ def get_list_of_advice(key_word) -> list[str]:
         return '\n'.join((s['advice'] for s in slips))
     return f'No advice for {key_word} :('
 
-def get_stocks_price(ticker) -> tuple(float, float, str):
+def get_stocks_price(ticker) -> tuple[float, float, str]:
     stock = Ticker(ticker)
     stock_info = stock.info
     return stock_info['regularMarketPrice'], stock_info['regularMarketPreviousClose'], stock_info['longName']
