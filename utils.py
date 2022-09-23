@@ -3,11 +3,13 @@ import json
 from yfinance import Ticker
 from datetime import datetime
 
+
 def chid(message):
     '''
     Returns message's chat id
     '''
     return message.chat.id
+
 
 def log_message(message, extra=''):
     if (mct := message.content_type) == 'text':
@@ -23,6 +25,7 @@ def log_message(message, extra=''):
     with open('log.txt', 'a+', encoding='utf-8') as f:
         print(to_log, file=f)
 
+
 def log(func):
     '''
     Decorator for logging users' queries with the log_message() funcion
@@ -34,14 +37,16 @@ def log(func):
 
 
 def get_record_chatid_map() -> dict:
-    # load the "username -> chat id" mapping 
+    # load the "username -> chat id" mapping
     with open('username_chatid_map.json', 'r') as f:
         return json.load(f)
+
 
 def save_record_chatid_map(username_to_chat_id: dict) -> None:
     # serialize the mapping
     with open('username_chatid_map.json', 'w') as fj:
         json.dump(username_to_chat_id, fj)
+
 
 def record_chat_id_entry(message) -> bool:
     username_to_chat_id = get_record_chatid_map()
@@ -50,6 +55,7 @@ def record_chat_id_entry(message) -> bool:
         save_record_chatid_map(username_to_chat_id)
         return True
     return False
+
 
 def delete_chat_id_entry(message) -> bool:
     username_to_chat_id = get_record_chatid_map()
@@ -61,12 +67,15 @@ def delete_chat_id_entry(message) -> bool:
 
 
 def is_prime(n: int) -> bool:
-    if n == 2 or n == 3: return True
-    if n % 2 == 0 or n < 2: return False
+    if n == 2 or n == 3:
+        return True
+    if n % 2 == 0 or n < 2:
+        return False
     for i in range(3, int(n**0.5) + 1, 2):
         if n % i == 0:
             return False
     return True
+
 
 def get_random_advice() -> str:
     url = 'https://api.adviceslip.com/advice'
@@ -74,16 +83,18 @@ def get_random_advice() -> str:
         data = json.load(url)
     return data['slip']['advice']
 
+
 def get_list_of_advice(key_word) -> list[str]:
     url = f'https://api.adviceslip.com/advice/search/{key_word}'
     with urlopen(url) as url:
-        data : dict = json.load(url)
+        data: dict = json.load(url)
     slips = data.get('slips', None)
     if slips:
         if len(slips) > 20:
             slips = slips[:20]
         return '\n'.join((s['advice'] for s in slips))
     return f'No advice for {key_word} :('
+
 
 def get_stocks_price(ticker) -> tuple[float, float, str]:
     stock = Ticker(ticker)

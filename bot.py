@@ -5,7 +5,8 @@ from random import randint
 import requests
 import re
 
-print(f'----------------- Bot started at {(t1:=datetime.now())} -----------------')
+print(
+    f'----------------- Bot started at {(t1:=datetime.now())} -----------------')
 
 with open('api_token.txt', 'r') as f:
     API_TOKEN = f.read()
@@ -24,6 +25,7 @@ def send_welcome(message):
     ])
     bot.reply_to(message, start_text)
 
+
 @bot.message_handler(commands=['help'])
 @log
 def send_help(message):
@@ -38,6 +40,7 @@ def send_help(message):
     ])
     bot.reply_to(message, help_text)
 
+
 @bot.message_handler(commands=['sub'])
 @log
 def sub(message):
@@ -45,6 +48,7 @@ def sub(message):
         bot.send_message(chid(message), 'You have just subscribed!')
     else:
         bot.send_message(chid(message), 'You are already subscribed!')
+
 
 @bot.message_handler(commands=['unsub'])
 @log
@@ -54,6 +58,7 @@ def unsub(message):
     else:
         bot.send_message(chid(message), 'You are not subscribed yet!')
 
+
 @bot.message_handler(commands=['notify'])
 @log
 def notify(message):
@@ -61,7 +66,8 @@ def notify(message):
         user_chat_ids = get_record_chatid_map()
         for username, chat_id in user_chat_ids.items():
             bot.send_message(chat_id, f'Notification to {username}!')
-        bot.send_message(chid(message), f'{" ".join(user_chat_ids.keys())} have been notified.')
+        bot.send_message(
+            chid(message), f'{" ".join(user_chat_ids.keys())} have been notified.')
     else:
         bot.send_message(chid(message), f'Sorry, you need to be an admin :(')
 
@@ -70,8 +76,11 @@ def notify(message):
 
 @bot.message_handler(commands=['keyboard'])
 def keyboard(message):
-    sent = bot.send_message(chid(message), 'Enter a keyboard type (inline/reply/info):')
+    sent = bot.send_message(
+        chid(message), 'Enter a keyboard type (inline/reply/info):')
     bot.register_next_step_handler(sent, start_keyboard)
+
+
 def start_keyboard(message):
     if message.text == 'inline':
         print('inline')
@@ -79,15 +88,17 @@ def start_keyboard(message):
         btn1 = types.InlineKeyboardButton('Btn1', url='google.com')
         btn2 = types.InlineKeyboardButton('Btn2', callback_data='btn2')
         btn3 = types.InlineKeyboardButton('Btn3', callback_data='btn3')
-        kb.add(btn1, btn2, btn3) 
-        sent = bot.send_message(chid(message), 'Choose a button:', reply_markup=kb)
+        kb.add(btn1, btn2, btn3)
+        sent = bot.send_message(
+            chid(message), 'Choose a button:', reply_markup=kb)
     elif message.text == 'reply':
         print('reply')
         kb = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
         btn1 = types.KeyboardButton('Dummy1')
         btn2 = types.KeyboardButton('Dummy2')
         kb.add(btn1, btn2)
-        sent = bot.send_message(chid(message), 'Choose a button:', reply_markup=kb)
+        sent = bot.send_message(
+            chid(message), 'Choose a button:', reply_markup=kb)
         bot.register_next_step_handler(sent, process_reply_buttons)
     elif message.text == 'info':
         print('info')
@@ -95,10 +106,14 @@ def start_keyboard(message):
         btn1 = types.KeyboardButton('Contacts', request_contact=True)
         btn2 = types.KeyboardButton('Location', request_location=True)
         kb.add(btn1, btn2)
-        sent = bot.send_message(chid(message), 'Choose a button:', reply_markup=kb)
-    
+        sent = bot.send_message(
+            chid(message), 'Choose a button:', reply_markup=kb)
+
+
 def process_reply_buttons(message):
-    bot.send_message(chid(message), f'You pressed {message.text}', reply_markup=types.ReplyKeyboardRemove())
+    bot.send_message(chid(
+        message), f'You pressed {message.text}', reply_markup=types.ReplyKeyboardRemove())
+
 
 @bot.callback_query_handler(func=lambda cb: cb.data)
 def process_inline_buttons(callback):
@@ -109,10 +124,13 @@ def process_inline_buttons(callback):
 
 # commands with arguments
 
+
 prime_pattern = r'/prime +(\d+)$'
+
+
 @bot.message_handler(commands=['prime'])
 @log
-def prime(message):
+def prime(message) -> None:
     if (m := re.compile(prime_pattern).match(message.text)):
         num, = m.groups()
         not_ = 'NOT ' if not is_prime(int(num)) else ''
@@ -121,10 +139,13 @@ def prime(message):
     else:
         bot.send_message(chid(message), 'Wrong format. Try "/prime 23"')
 
+
 rnd_number_pattern = r'/random +(\d+) +(\d+)$'
+
+
 @bot.message_handler(commands=['random'])
 @log
-def random(message):
+def random(message) -> None:
     if (m := re.compile(rnd_number_pattern).match(message.text)):
         a, b = m.groups()
         ret_text = f'Your number is {randint(int(a), int(b))}'
@@ -132,7 +153,10 @@ def random(message):
     else:
         bot.send_message(chid(message), 'Wrong format. Try "/random 1 10"')
 
+
 advice_pattern = r'/advice +(\w+)'
+
+
 @bot.message_handler(commands=['advice'])
 # log_message function has an extra argument => no decorator here
 def advice(message):
@@ -145,7 +169,10 @@ def advice(message):
         log_message(message, extra=advice)
     bot.send_message(chid(message), advice)
 
+
 stocks_pattern = r'/stocks +(\w+)'
+
+
 @bot.message_handler(commands=['stocks'])
 @log
 def stocks(message):
@@ -153,18 +180,22 @@ def stocks(message):
         ticker, = m.groups()
         try:
             regular_price, close_price, name = get_stocks_price(ticker)
-            bot.send_message(chid(message), f'{name}\nRegular market price: {regular_price}\nClosing price: {close_price}')
+            bot.send_message(chid(
+                message), f'{name}\nRegular market price: {regular_price}\nClosing price: {close_price}')
         except KeyError as e:
             bot.send_message(chid(message), f'Unknown ticker: {ticker}.')
             print(e)
     else:
         bot.send_message(chid(message), 'Wrong format. Try "/stocks aapl"')
 
+
 send_pattern = r'/send +(\d+) +(.*)$'
+
+
 @bot.message_handler(commands=['send'])
 @log
 def send(message):
-    if (m:=re.compile(send_pattern).match(message.text)):
+    if (m := re.compile(send_pattern).match(message.text)):
         to_chat_id, msg_text = m.groups()
         try:
             bot.send_message(int(to_chat_id), msg_text)
@@ -172,7 +203,10 @@ def send(message):
         except Exception as e:
             print(e)
 
+
 req_photo_by_id_pattern = r'/photo +(.+)$'
+
+
 @bot.message_handler(commands=['photo'])
 @log
 def photo(message):
@@ -187,7 +221,10 @@ def photo(message):
     else:
         bot.send_message(chid(message), 'Wrong format.')
 
+
 req_file_by_id_pattern = r'/file +(.+)$'
+
+
 @bot.message_handler(commands=['file'])
 @log
 def file(message):
@@ -202,7 +239,10 @@ def file(message):
     else:
         bot.send_message(chid(message), 'Wrong format.')
 
+
 download_pattern = r'/download +(.+)$'
+
+
 @bot.message_handler(commands=['download'])
 @log
 def download(message):
@@ -224,33 +264,44 @@ def download(message):
 
 # by content type
 
+
 @bot.message_handler(content_types=['photo'])
 @log
 def photo(message):
     print('photo', message.photo[0])
-    bot.send_message(chid(message), f'Got a photo of size {message.photo[0].file_size} bytes')
-    
+    bot.send_message(
+        chid(message), f'Got a photo of size {message.photo[0].file_size} bytes')
+
+
 @bot.message_handler(content_types=['document'])
 @log
 def document(message):
     print('document', message.document)
-    bot.send_message(chid(message), f'Got a document {message.document.file_name} of size {message.document.file_size} bytes')
+    bot.send_message(chid(
+        message), f'Got a document {message.document.file_name} of size {message.document.file_size} bytes')
+
 
 @bot.message_handler(content_types=['voice'])
 @log
 def voice(message):
     print('voice', message.voice)
-    bot.send_message(chid(message), f'Got a voice message ({message.voice.duration} sec) of size {message.voice.file_size} bytes')
+    bot.send_message(chid(
+        message), f'Got a voice message ({message.voice.duration} sec) of size {message.voice.file_size} bytes')
+
 
 @bot.message_handler(content_types=['contact'])
 @log
 def contact(message):
     mc = message.contact
     with open('contacts.csv', 'a+', encoding='utf-8') as f:
-        print(message.from_user.username, mc.first_name, mc.phone_number, mc.user_id, chid(message), file=f, sep=',')
-    bot.send_message(chid(message), 'Contact successfully received!', reply_markup=types.ReplyKeyboardRemove())
+        print(message.from_user.username, mc.first_name, mc.phone_number,
+              mc.user_id, chid(message), file=f, sep=',')
+    bot.send_message(chid(message), 'Contact successfully received!',
+                     reply_markup=types.ReplyKeyboardRemove())
 
 # from the local dir
+
+
 @bot.message_handler(commands=['getphoto'])
 @log
 def getphoto(message):
@@ -259,17 +310,23 @@ def getphoto(message):
         bot.send_photo(chid(message), photo)
 
 # else:
+
+
 @bot.message_handler(func=lambda message: message.text.startswith('/'))
 @log
 def echo_command(message):
-    bot.send_message(chid(message), f'Unknown command: {message.text}. Try typing /help')
+    bot.send_message(
+        chid(message), f'Unknown command: {message.text}. Try typing /help')
+
 
 @bot.message_handler(func=lambda message: True)
 @log
 def echo_all(message):
     bot.send_message(chid(message), 'What sort of gibberish is this?')
 
+
 bot.infinity_polling()
 
-print(f'----------------- Bot shut down at {(t2:=datetime.now())} -----------------')
+print(
+    f'----------------- Bot shut down at {(t2:=datetime.now())} -----------------')
 print('running time:', t2 - t1)
