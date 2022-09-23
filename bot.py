@@ -141,8 +141,6 @@ def prime(message) -> None:
 
 
 rnd_number_pattern = r'/random +(\d+) +(\d+)$'
-
-
 @bot.message_handler(commands=['random'])
 @log
 def random(message) -> None:
@@ -154,20 +152,19 @@ def random(message) -> None:
         bot.send_message(chid(message), 'Wrong format. Try "/random 1 10"')
 
 
-advice_pattern = r'/advice +(\w+)'
-
-
 @bot.message_handler(commands=['advice'])
-# log_message function has an extra argument => no decorator here
-def advice(message):
-    if (m := re.compile(advice_pattern).match(message.text)):
-        word, = m.groups()
-        advice = get_list_of_advice(word)
-        log_message(message)
-    else:
-        advice = get_random_advice()
-        log_message(message, extra=advice)
-    bot.send_message(chid(message), advice)
+def advice(message) -> None:
+    match message.text.split():
+        case ['/advice']:
+            advice = get_random_advice()
+            log_message(message, extra=advice)
+        case ['/advice', word]:
+            advice = get_list_of_advice(word)
+            log_message(message)
+        case _:
+            advice = None
+    if advice is not None:
+        bot.send_message(chid(message), advice)
 
 
 stocks_pattern = r'/stocks +(\w+)'
