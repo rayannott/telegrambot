@@ -277,7 +277,6 @@ def document(message):
     bot.send_message(chid(
         message), f'Got a document {message.document.file_name} of size {message.document.file_size} bytes')
 
-
 @bot.message_handler(content_types=['voice'])
 @log
 def voice(message):
@@ -321,9 +320,8 @@ def echo_command(message):
 def echo_all(message):
     bot.send_message(chid(message), 'What sort of gibberish is this?')
 
-
-bot.infinity_polling()
-
-print(
-    f'----------------- Bot shut down at {(t2:=datetime.now())} -----------------')
-print('running time:', t2 - t1)
+if __name__ == '__main__':
+    bot.infinity_polling()
+    print(
+        f'----------------- Bot shut down at {(t2:=datetime.now())} -----------------')
+    print('running time:', t2 - t1)
