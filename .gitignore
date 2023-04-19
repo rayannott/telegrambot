@@ -1,0 +1,11 @@
+venv/
+photos/
+documents/
+voice/
+__pycache__/
+log.txt
+test.py
+username_chatid_map.json
+contacts.csv
+api_token.txt
+python_test_functions/
